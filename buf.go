@@ -82,7 +82,7 @@ func (b *bufferManager_t) GetCurrentDataSlice() []byte {
 
 func (b *bufferManager_t) GetCurrentValidDataSlice() []byte {
 	if b.current != nil {
-		return b.current[sizeOfDescription:b.GetLength()]
+		return b.current[sizeOfDescription : sizeOfDescription+b.GetLength()]
 	} else {
 		return nil
 	}
