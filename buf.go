@@ -98,7 +98,12 @@ func (b *bufferManager_t) Tail() chan<- []byte {
 }
 
 func (b *bufferManager_t) Head() <-chan []byte {
-	return b.list
+	select {
+	case b.current = <-b.list:
+		b.currentBufCount--
+		b.tmpCh <- b.current
+	}
+	return b.tmpCh
 }
 
 func (b *bufferManager_t) SetLength(len uint) {
