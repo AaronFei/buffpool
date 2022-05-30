@@ -87,16 +87,16 @@ func (b *bufferManager_t) GetCurrentSlice() []byte {
 	return b.current
 }
 
+func (b *bufferManager_t) SetCurrentSlice(buf []byte) {
+	b.current = buf
+}
+
 func (b *bufferManager_t) Tail() chan<- []byte {
 	return b.list
 }
 
 func (b *bufferManager_t) Head() <-chan []byte {
-	select {
-	case b.current = <-b.list:
-		b.tmpCh <- b.current
-	}
-	return b.tmpCh
+	return b.list
 }
 
 func (b *bufferManager_t) SetLength(len uint) {
