@@ -80,6 +80,14 @@ func (b *bufferManager_t) GetCurrentDataSlice() []byte {
 	}
 }
 
+func (b *bufferManager_t) GetCurrentValidDataSlice() []byte {
+	if b.current != nil {
+		return b.current[sizeOfDescription:b.GetLength()]
+	} else {
+		return nil
+	}
+}
+
 func (b *bufferManager_t) GetCurrentSlice() []byte {
 	return b.current
 }
@@ -106,19 +114,4 @@ func (b *bufferManager_t) GetLength() uint {
 
 func (b *bufferManager_t) BufferCount() int {
 	return b.currentBufCount
-}
-
-func GetCurrentDataSlice(buf []byte) []byte {
-	return buf[sizeOfDescription:]
-}
-
-func GetLength(buf []byte) uint {
-	return uint(buf[0]) + uint(buf[1])<<8 + uint(buf[2])<<16 + uint(buf[3])<<24
-}
-
-func SetLength(buf []byte, len uint) {
-	buf[0] = byte(len)
-	buf[1] = byte(len >> 8)
-	buf[2] = byte(len >> 16)
-	buf[3] = byte(len >> 24)
 }
