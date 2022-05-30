@@ -6,8 +6,7 @@ type bufferManager_t struct {
 	list  chan []byte
 	tmpCh chan []byte
 
-	currentBufCount int
-	current         []byte
+	current []byte
 
 	configBufCount  int
 	configBufSize   int
@@ -22,7 +21,6 @@ func GetBufferManager() bufferManager_t {
 	bufferInfo := bufferManager_t{
 		configSlotCount: 0,
 		configBufCount:  0,
-		currentBufCount: 0,
 		configBufSize:   0,
 		current:         nil,
 		isInitialized:   false,
@@ -53,8 +51,6 @@ func (b *bufferManager_t) Reset() {
 	for i := 0; i < b.configBufCount; i++ {
 		b.Tail() <- make([]byte, sizeOfDescription+b.configBufSize)
 	}
-
-	b.currentBufCount = b.configBufCount
 }
 
 func (b *bufferManager_t) Next() bool {
@@ -64,7 +60,6 @@ func (b *bufferManager_t) Next() bool {
 
 	select {
 	case buf := <-b.list:
-		b.currentBufCount--
 		b.current = buf
 		return true
 	default:
@@ -93,14 +88,12 @@ func (b *bufferManager_t) GetCurrentSlice() []byte {
 }
 
 func (b *bufferManager_t) Tail() chan<- []byte {
-	b.currentBufCount++
 	return b.list
 }
 
 func (b *bufferManager_t) Head() <-chan []byte {
 	select {
 	case b.current = <-b.list:
-		b.currentBufCount--
 		b.tmpCh <- b.current
 	}
 	return b.tmpCh
@@ -118,5 +111,5 @@ func (b *bufferManager_t) GetLength() uint {
 }
 
 func (b *bufferManager_t) BufferCount() int {
-	return b.currentBufCount
+	return len(b.list)
 }
