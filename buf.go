@@ -94,7 +94,7 @@ func (b *bufferManager_t) Head() <-chan []byte {
 	case buf := <-b.list:
 		b.currentBufCount--
 		b.current = buf
-		b.tmpCh <- b.current
+		b.tmpCh <- nil
 	}
 	return b.tmpCh
 }
