@@ -3,7 +3,8 @@ package simplebuf
 import "fmt"
 
 type bufferManager_t struct {
-	list chan []byte
+	list  chan []byte
+	tmpCh chan []byte
 
 	currentBufCount int
 	current         []byte
@@ -25,6 +26,7 @@ func GetBufferManager() bufferManager_t {
 		configBufSize:   0,
 		current:         nil,
 		isInitialized:   false,
+		tmpCh:           make(chan []byte, 1),
 	}
 
 	return bufferInfo
@@ -85,6 +87,16 @@ func (b *bufferManager_t) GetCurrentSlice() []byte {
 func (b *bufferManager_t) Tail() chan<- []byte {
 	b.currentBufCount++
 	return b.list
+}
+
+func (b *bufferManager_t) Head() <-chan []byte {
+	select {
+	case buf := <-b.list:
+		b.currentBufCount--
+		b.current = buf
+		b.tmpCh <- b.current
+	}
+	return b.tmpCh
 }
 
 func (b *bufferManager_t) SetLength(len uint) {
