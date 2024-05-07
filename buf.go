@@ -96,7 +96,10 @@ func (b *bufferManager_t) Tail() chan<- []byte {
 }
 
 func (b *bufferManager_t) Head() <-chan []byte {
-	return b.list
+	buf := <-b.list
+	b.current = buf
+	b.tmpCh <- buf
+	return b.tmpCh
 }
 
 func (b *bufferManager_t) SetLength(len uint) {
