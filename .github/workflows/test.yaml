@@ -1,7 +1,21 @@
 name: Run tests and upload coverage
 
 on:
-  push
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  inputs:
+    debug_enabled:
+      description: 'Run with debug logging'
+      type: boolean
+      required: false
+      default: false
+    tags:
+      description: 'Test specific tags'
+      type: string
+      required: false
+      default: ''
+
 
 jobs:
   test:
