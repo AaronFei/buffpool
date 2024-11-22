@@ -91,7 +91,7 @@ func (p *Pool[T]) BufferChan() <-chan *Buffer[T] {
 		return nil
 	}
 
-	out := make(chan *Buffer[T], cap(p.buffers))
+	out := make(chan *Buffer[T])
 	go func() {
 		for buf := range p.buffers {
 			if atomic.CompareAndSwapInt32(&buf.inUse, 0, 1) {

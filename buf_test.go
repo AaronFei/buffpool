@@ -212,3 +212,102 @@ func TestDoubleRelease(t *testing.T) {
 
 	buf.Release()
 }
+
+func TestSetLengthExceedCapacity(t *testing.T) {
+	pool := NewPool[int]()
+	pool.Init(1, 10)
+	buf, _ := pool.Acquire()
+	buf.SetLength(20)
+	if buf.GetLength() != 10 {
+		t.Errorf("Expected length to be capped at 10, got %d", buf.GetLength())
+	}
+	buf.Release()
+}
+
+func TestInitReleasedPool(t *testing.T) {
+	pool := NewPool[int]()
+	pool.Init(5, 10)
+	pool.Release()
+	err := pool.Init(5, 10)
+	if err == nil || err.Error() != "pool has been released" {
+		t.Errorf("Expected 'pool has been released' error, got %v", err)
+	}
+}
+
+func TestPutEdgeCases(t *testing.T) {
+	pool := NewPool[int]()
+	pool.Init(1, 10)
+
+	buf, _ := pool.Acquire()
+	buf.Release()
+
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("Expected panic when putting buffer to full pool")
+		}
+	}()
+	pool.put(buf)
+
+	buf, _ = pool.Acquire()
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("Expected panic when putting in-use buffer")
+		}
+	}()
+	pool.put(buf)
+}
+
+func TestAcquireEdgeCases(t *testing.T) {
+	pool := NewPool[int]()
+	pool.Init(1, 10)
+
+	// 獲取唯一的 buffer
+	buf1, ok := pool.Acquire()
+	if !ok {
+		t.Fatal("Failed to acquire first buffer")
+	}
+
+	// 嘗試獲取第二個 buffer（應該失敗）
+	buf2, ok := pool.Acquire()
+	if ok || buf2 != nil {
+		t.Error("Expected failure when acquiring from empty pool")
+	}
+
+	// 釋放並重新獲取以覆蓋 put 和 re-acquire 的情況
+	buf1.Release()
+	buf2, ok = pool.Acquire()
+	if !ok || buf2 == nil {
+		t.Error("Failed to re-acquire buffer after release")
+	}
+}
+
+func TestResetEdgeCases(t *testing.T) {
+	pool := NewPool[int]()
+
+	// 測試重置未初始化的池
+	pool.Reset()
+	if pool.Available() != 0 {
+		t.Error("Resetting uninitialized pool should have no effect")
+	}
+
+	// 初始化並獲取所有 buffer
+	pool.Init(2, 10)
+	buf1, _ := pool.Acquire()
+	buf2, _ := pool.Acquire()
+
+	// 重置池（應該清除並重新填充）
+	pool.Reset()
+
+	if pool.Available() != 2 {
+		t.Errorf("Expected 2 available buffers after reset, got %d", pool.Available())
+	}
+
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("Expected panic when putting buffer to full pool")
+		}
+	}()
+
+	buf1.Release()
+	buf2.Release()
+}
