@@ -88,8 +88,6 @@ pool.Reset()
 bufChan := pool.BufferChan()
 ```
 
-[previous sections remain the same...]
-
 ## Advanced Usage
 
 ### Safe Concurrent Usage
@@ -159,8 +157,6 @@ This example demonstrates:
 - Consumer processes only the valid data and releases the buffer
 - Multiple producers and consumers can work concurrently
 - Buffers are safely reused through the pool
-
-[rest of the readme remains the same...]
 
 ### Using BufferChan for Stream Processing
 
