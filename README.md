@@ -1,6 +1,6 @@
 # BuffPool
 
-[![Tests](https://github.com/AaronFei/buffpool/actions/workflows/test.yml/badge.svg)](https://github.com/AaronFei/buffpool/actions/workflows/test.yml)
+[![Tests](https://github.com/AaronFei/buffpool/actions/workflows/test.yaml/badge.svg)](https://github.com/AaronFei/buffpool/actions/workflows/test.yaml)
 [![codecov](https://codecov.io/gh/AaronFei/buffpool/branch/main/graph/badge.svg)](https://codecov.io/gh/AaronFei/buffpool)
 [![Go Report Card](https://goreportcard.com/badge/github.com/AaronFei/buffpool)](https://goreportcard.com/report/github.com/AaronFei/buffpool)
 [![GoDoc](https://godoc.org/github.com/AaronFei/buffpool?status.svg)](https://godoc.org/github.com/AaronFei/buffpool)
