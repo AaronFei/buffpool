@@ -1,3 +1,3 @@
-module github.com/AaronFei/simplebuf
+module github.com/AaronFei/buffpool
 
-go 1.18
+go 1.23
