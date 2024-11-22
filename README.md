@@ -1,5 +1,10 @@
 # BuffPool
 
+[![Tests](https://github.com/AaronFei/buffpool/actions/workflows/test.yml/badge.svg)](https://github.com/AaronFei/buffpool/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/AaronFei/buffpool/branch/main/graph/badge.svg)](https://codecov.io/gh/AaronFei/buffpool)
+[![Go Report Card](https://goreportcard.com/badge/github.com/AaronFei/buffpool)](https://goreportcard.com/report/github.com/AaronFei/buffpool)
+[![GoDoc](https://godoc.org/github.com/AaronFei/buffpool?status.svg)](https://godoc.org/github.com/AaronFei/buffpool)
+
 BuffPool is a generic buffer pool implementation in Go that provides efficient buffer reuse capabilities through a thread-safe pool mechanism. By reusing buffers instead of allocating new ones, it significantly reduces garbage collection pressure and improves performance in high-throughput scenarios.
 
 ## Features
