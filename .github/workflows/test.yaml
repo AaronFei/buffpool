@@ -4,18 +4,17 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
-  inputs:
-    debug_enabled:
-      description: 'Run with debug logging'
-      type: boolean
-      required: false
-      default: false
-    tags:
-      description: 'Test specific tags'
-      type: string
-      required: false
-      default: ''
-
+    inputs:
+      debug_enabled:
+        description: 'Run with debug logging'
+        type: boolean
+        required: false
+        default: false
+      tags:
+        description: 'Test specific tags'
+        type: string
+        required: false
+        default: ''
 
 jobs:
   test:
@@ -29,6 +28,8 @@ jobs:
 
       - name: Set up Go
         uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
 
       - name: Install dependencies
         run: go mod download
