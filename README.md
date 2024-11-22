@@ -83,42 +83,79 @@ pool.Reset()
 bufChan := pool.BufferChan()
 ```
 
+[previous sections remain the same...]
+
 ## Advanced Usage
 
 ### Safe Concurrent Usage
 
 ```go
-func processData(pool *buffpool.Pool[int], wg *sync.WaitGroup) {
+func producer(pool *buffpool.Pool[byte], dataChan chan<- *Buffer[byte], wg *sync.WaitGroup) {
     defer wg.Done()
 
+    // Acquire a buffer from pool
     buf, ok := pool.Acquire()
     if !ok {
-        // Pool might be exhausted or released
         return
     }
-    defer buf.Release() // Safely returns buffer to pool
 
-    // Process data...
+    // Simulate filling the buffer with data
     data := buf.GetFullData()
-    // ... do something with data
-    buf.SetLength(newLength)
+    // ... fill data ...
+    buf.SetLength(100) // Set valid data length
+
+    // Send buffer to consumer through channel
+    dataChan <- buf
+}
+
+func consumer(dataChan <-chan *Buffer[byte], wg *sync.WaitGroup) {
+    defer wg.Done()
+
+    // Receive buffer from channel
+    buf := <-dataChan
+
+    // Process only valid data
+    validData := buf.GetValidData()
+    // ... process validData ...
+
+    // Release buffer back to pool when done
+    buf.Release()
 }
 
 func main() {
-    pool := buffpool.NewPool[int]()
+    pool := buffpool.NewPool[byte]()
     if err := pool.Init(10, 1024); err != nil {
         log.Fatal(err)
     }
-    defer pool.Release() // Properly cleanup the pool
+    defer pool.Release()
 
+    dataChan := make(chan *Buffer[byte], 10)
     var wg sync.WaitGroup
-    for i := 0; i < 20; i++ {
+
+    // Start multiple producers
+    for i := 0; i < 5; i++ {
         wg.Add(1)
-        go processData(pool, &wg)
+        go producer(pool, dataChan, &wg)
     }
+
+    // Start multiple consumers
+    for i := 0; i < 5; i++ {
+        wg.Add(1)
+        go consumer(dataChan, &wg)
+    }
+
     wg.Wait()
 }
 ```
+
+This example demonstrates:
+- Producer acquires buffer from pool and fills it with data
+- Buffer is passed to consumer through a channel
+- Consumer processes only the valid data and releases the buffer
+- Multiple producers and consumers can work concurrently
+- Buffers are safely reused through the pool
+
+[rest of the readme remains the same...]
 
 ### Using BufferChan for Stream Processing
 
